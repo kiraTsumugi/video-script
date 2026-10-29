@@ -61,9 +61,17 @@ class ModelClient:
         try:
             with urllib.request.urlopen(req, timeout=60) as resp:
                 body = json.loads(resp.read().decode())
-            return _parse_action(body["choices"][0]["message"]["content"])
+            content = body["choices"][0]["message"]["content"]
         except urllib.error.URLError as e:
             raise RuntimeError(f"model_call_failed: {e}") from e
+        except (KeyError, IndexError, json.JSONDecodeError) as e:
+            raise RuntimeError(f"model_response_malformed: {e}") from e
+        try:
+            return _parse_action(content)
+        except (json.JSONDecodeError, ValueError) as e:
+            # 非 JSON 输出（真实模型常见）：作为契约违规返回，让循环层观察并自纠
+            return {"action": "<invalid>", "args": {},
+                    "reason": f"模型返回非 JSON：{str(content)[:80]}"}
 
 
 def _parse_action(content: str) -> dict:

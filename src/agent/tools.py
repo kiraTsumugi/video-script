@@ -28,6 +28,7 @@ class Tools:
 
     # --- 1. 素材检索：返回命中素材 ----------------------------------------
     def search_materials(self, query: str) -> dict:
+        query = "" if query is None else str(query)
         if self._fail.get("tool") == "search_materials" and any(
                 k in query for k in self._fail.get("keywords", [])):
             return {"ok": False, "error": "tool_error", "tool": "search_materials",
@@ -74,22 +75,35 @@ class Tools:
 
     # --- 3. 规则检查：返回违规事实 ----------------------------------------
     def check_rules(self, script: dict) -> dict:
-        """script: {"shots":[{index,duration,narration,cites},...]}
-        逐条规则核对；grounded 规则校验旁白宣称是否有素材事实支撑。"""
-        shots = script.get("shots", [])
+        """script: {"title":..., "shots":[{index,duration,narration,cites},...]}
+        逐条规则核对；grounded 规则校验旁白宣称是否有素材事实支撑。
+        字段值为 null/缺类型时统一视为空字符串——不崩溃（第4阶段边界加固）。"""
+        shots = script.get("shots", []) if isinstance(script, dict) else []
+        title = str(script.get("title") or "") if isinstance(script, dict) else ""
         violations: list[Violation] = []
+
+        def s_int(s, key, default=0):
+            try:
+                return int(s.get(key, default))
+            except (TypeError, ValueError):
+                return default
+
+        def s_str(s, key):
+            v = s.get(key)
+            return "" if v is None else str(v)
+
         for r in self._rules:
             t = r["type"]
             if t == "shot_min_duration":
                 for s in shots:
-                    if int(s.get("duration", 0)) < r["value"]:
+                    if s_int(s, "duration") < r["value"]:
                         violations.append(Violation(
                             r["id"], r["desc"], r["severity"],
                             f"第{s.get('index')}镜 {s.get('duration')}s < {r['value']}s",
                             s.get("index")))
             elif t == "shot_max_duration":
                 for s in shots:
-                    if int(s.get("duration", 0)) > r["value"]:
+                    if s_int(s, "duration") > r["value"]:
                         violations.append(Violation(
                             r["id"], r["desc"], r["severity"],
                             f"第{s.get('index')}镜 {s.get('duration')}s > {r['value']}s",
@@ -103,7 +117,7 @@ class Tools:
                             f"第{s.get('index')}镜未引用素材", s.get("index")))
             elif t == "grounded_number":
                 for s in shots:
-                    nums = re.findall(r"\d+(?:\.\d+)?", s.get("narration", ""))
+                    nums = re.findall(r"\d+(?:\.\d+)?", s_str(s, "narration"))
                     if not nums:
                         continue
                     facts_text = self._facts_text(s.get("cites", []))
@@ -117,7 +131,7 @@ class Tools:
                 for s in shots:
                     facts_text = self._facts_text(s.get("cites", []))
                     for w in r["words"]:
-                        if w in s.get("narration", "") and w not in facts_text:
+                        if w in s_str(s, "narration") and w not in facts_text:
                             violations.append(Violation(
                                 r["id"], r["desc"], r["severity"],
                                 f"第{s.get('index')}镜效果宣称「{w}」无素材依据",
@@ -125,13 +139,13 @@ class Tools:
             elif t == "banned_words":
                 # 输出任何位置都不得残留违禁词：逐镜（旁白+画面）与标题
                 for w in r["words"]:
-                    if w in script.get("title", ""):
+                    if w in title:
                         violations.append(Violation(
                             r["id"], r["desc"], r["severity"],
                             f"标题出现违禁词「{w}」"))
                 for s in shots:
                     for w in r["words"]:
-                        if w in s.get("narration", "") or w in s.get("visual", ""):
+                        if w in s_str(s, "narration") or w in s_str(s, "visual"):
                             violations.append(Violation(
                                 r["id"], r["desc"], r["severity"],
                                 f"第{s.get('index')}镜出现违禁词「{w}」", s.get("index")))

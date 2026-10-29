@@ -33,7 +33,7 @@ cd video-script
 # ① 核心：正常生成 + 超时长修正闭环（每步 动作→观察→决策依据）
 python -m src.main --topic "产品特色 支持字幕" --duration 30 -v
 
-# ② 全量测试（26 项）
+# ② 全量测试（41 项）
 python -m unittest discover -s tests -v
 ```
 
@@ -60,7 +60,7 @@ python -m unittest discover -s tests -v
 | 规则违规→修正→重检 | `--topic "世界级音质"` | 拦截→修正标题/旁白→重检通过 | `examples/trace_rule_violation.json` |
 | 超时长修正失败 | `--duration 5` | `cannot_satisfy` + 缺口 | `examples/trace_cannot_satisfy.json` |
 
-完整测试：**26 项**，`python -m unittest discover -s tests -v` 全绿（输出见 `examples/test-results.txt`）。
+完整测试：**41 项**，`python -m unittest discover -s tests -v` 全绿（输出见 `examples/test-results.txt`）。
 
 ## ReAct 决策证据（两条不同路径）
 
@@ -103,6 +103,21 @@ step7 finish(generated) → 总时长 28s
 | 估算/检查可被模型参数绕过（检查 A 版、输出 B 版） | 循环层强制用当前脚本执行估算/检查 |
 | 压缩与规则修正共用一个计数器 | 解耦为 `compressions`/`fixes` 独立计数 |
 
+## 第 4 阶段补充：边界与质量加固记录
+
+| 级别 | 问题（第 4 阶段排查） | 修复 |
+|---|---|---|
+| **P0** | live 模型返回非 JSON（真实模型常见）→ `JSONDecodeError` 直接崩溃 | `_call_live` 把非 JSON 输出转为契约违规动作，循环层喂回自纠；模型连接异常/响应畸形 → 循环层捕获返回 `tool_error` + 缺口，绝不崩溃 |
+| P1 | 纯空格主题 → 误走 `no_material`（语义错误） | 输入规范化：`strip()` 后为空 → `needs_more_info` |
+| P1 | 负数/零时长 → 误走"过短无法满足" | `target_duration <= 0` → `needs_more_info`（需为正整数秒） |
+| P1 | `check_rules` 遇到 `narration: None` 等 null 值 → `TypeError` 崩溃 | 工具层自防御：null/非法类型统一按空值处理（同类调用点全部加固） |
+| P1 | `search_materials(None)` → 崩溃（依赖调用方转字符串） | 工具层自防御：`str(query or "")` |
+| P1 | `--trace` 写入不存在目录 → `FileNotFoundError` 崩溃 | 写入失败仅 stderr 警告，主流程结果不受影响 |
+| P1 | 起草 shots 字段传字符串/非法 index | `_build_script` 归一化：cites 字符串→列表、非法 index→序号兜底 |
+
+边界回归测试：`TestBoundaryInputs`（+7）、`TestModelFailureFallback`（+2）、
+`TestToolInputHardening`（+5），合计 41 项测试全绿。
+
 ## 已知限制（诚实声明）
 
 1. **默认离线 Mock 不代表真实 LLM 决策质量**：只验证流程、边界与修正逻辑。真实能力需配
@@ -125,7 +140,7 @@ src/agent/tools.py     工具层（检索/估算/检查；只返回事实）
 src/agent/llm.py       模型接入（OpenAI 兼容 + 确定性离线 Mock；事实派生起草）
 src/agent/react_loop.py ReAct 循环（步数上限 12；generated 守卫）
 src/main.py            CLI 入口
-tests/test_agent.py    26 项可执行测试
+tests/test_agent.py    41 项可执行测试
 examples/              运行记录（8 组 Trace + CLI 输出 + 测试输出 + INDEX）+ 生成/验证脚本
 data/                  合成产品素材（P01-P04）+ 品牌规则 + 改写知识表
 ```

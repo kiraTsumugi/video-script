@@ -65,8 +65,12 @@ def main(argv: list[str] | None = None) -> int:
     out["model_mode"] = model.mode
 
     if args.trace:
-        with open(args.trace, "w", encoding="utf-8") as f:
-            json.dump(out, f, ensure_ascii=False, indent=2)
+        try:
+            with open(args.trace, "w", encoding="utf-8") as f:
+                json.dump(out, f, ensure_ascii=False, indent=2)
+        except OSError as e:
+            # trace 落盘失败不吞结果：提示到 stderr，主流程继续输出
+            print(f"[warn] trace 写入失败（{e}），已跳过落盘", file=sys.stderr)
 
     if args.json:
         print(json.dumps(out, ensure_ascii=False, indent=2))

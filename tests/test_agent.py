@@ -257,6 +257,202 @@ class TestMalformedOutput(unittest.TestCase):
         self.assertEqual(r.status, "incomplete")
 
 
+class TestBoundaryInputs(unittest.TestCase):
+    """第4阶段: 空/非法/超长输入的优雅处理。"""
+
+    def test_whitespace_topic_needs_more_info(self):
+        r, _ = go("   ", 30)
+        self.assertEqual(r.status, "needs_more_info")
+        self.assertTrue(any("主题" in g for g in r.gap))
+
+    def test_negative_duration_needs_more_info(self):
+        r, _ = go("产品特色 支持字幕", -5)
+        self.assertEqual(r.status, "needs_more_info")
+
+    def test_zero_duration_needs_more_info(self):
+        r, _ = go("产品特色 支持字幕", 0)
+        self.assertEqual(r.status, "needs_more_info")
+
+    def test_very_long_topic_no_crash(self):
+        r, _ = go("词" * 10000, 30)
+        self.assertEqual(r.status, "no_material")
+
+    def test_huge_duration_ok(self):
+        r, _ = go("产品特色 支持字幕", 999999)
+        self.assertEqual(r.status, "generated")
+        self.assertEqual(r.script.total_duration, 38)  # 宽松目标无修正
+
+    def test_empty_material_library(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            for f in ("synonyms.json", "brand_rules.json"):
+                shutil.copy(DATA / f, tmp / f)
+            docs = json.loads((DATA / "materials.json").read_text(encoding="utf-8"))
+            docs["materials"] = []
+            (tmp / "materials.json").write_text(
+                json.dumps(docs, ensure_ascii=False), encoding="utf-8")
+            r, _ = go("产品特色", 30, tools=Tools(data_dir=tmp))
+            self.assertEqual(r.status, "no_material")
+
+    def test_empty_shots_draft_rejected(self):
+        class M:
+            mode = "bad"
+
+            def __init__(self):
+                self.n = 0
+
+            def decide(self, s, m):
+                self.n += 1
+                if self.n == 1:
+                    return {"action": "search_materials",
+                            "args": {"query": "支持字幕"}}
+                if self.n == 2:
+                    return {"action": "draft_script",
+                            "args": {"title": "t", "shots": []}}
+                return {"action": "finish", "status": "no_material"}
+
+        r = run("产品特色 支持字幕", 30, model=M(), tools=Tools())
+        draft_obs = next(t.observation for t in r.trace
+                         if t.action == "draft_script")
+        self.assertEqual(draft_obs.get("error"), "empty_shots")
+
+    def test_bad_shot_types_no_crash(self):
+        """cites 传字符串、index 传非法值 → 不崩溃。"""
+        class M:
+            mode = "bad"
+
+            def __init__(self):
+                self.n = 0
+
+            def decide(self, s, m):
+                self.n += 1
+                if self.n == 1:
+                    return {"action": "search_materials",
+                            "args": {"query": "支持字幕"}}
+                if self.n == 2:
+                    return {"action": "draft_script", "args": {
+                        "title": "t", "shots": [
+                            {"index": "x", "duration": "4",
+                             "visual": "a", "narration": "支持字幕",
+                             "cites": "P01"}]}}
+                return {"action": "finish", "status": "incomplete"}
+
+        r = run("产品特色 支持字幕", 30, model=M(), tools=Tools())
+        self.assertIsNotNone(r.script)
+        self.assertEqual(r.script.shots[0].cites, ["P01"])  # 字符串归一为列表
+        self.assertEqual(r.script.shots[0].index, 1)  # 非法 index 用序号兜底
+
+
+class TestModelFailureFallback(unittest.TestCase):
+    """第4阶段: 模型调用失败的回退（P0）。"""
+
+    def test_model_exception_returns_tool_error(self):
+        class Broken:
+            mode = "broken"
+
+            def decide(self, s, m):
+                raise RuntimeError("model_call_failed: connection refused")
+
+        r = run("产品特色 支持字幕", 30, model=Broken(), tools=Tools())
+        self.assertEqual(r.status, "tool_error")
+        self.assertTrue(any("模型调用失败" in g for g in r.gap))
+
+    def test_non_json_model_output_no_crash(self):
+        """live 模型返回非 JSON → 契约违规自纠，不崩溃。"""
+        import os
+        import threading
+        from http.server import BaseHTTPRequestHandler, HTTPServer
+
+        for k in ("http_proxy", "https_proxy", "HTTP_PROXY", "HTTPS_PROXY",
+                  "all_proxy", "ALL_PROXY"):
+            os.environ.pop(k, None)
+
+        class H(BaseHTTPRequestHandler):
+            def do_POST(self):
+                n = int(self.headers.get("Content-Length", 0))
+                self.rfile.read(n)
+                d = b'{"choices":[{"message":{"content":"NOT JSON"}}]}'
+                self.send_response(200)
+                self.send_header("Content-Length", str(len(d)))
+                self.end_headers()
+                self.wfile.write(d)
+
+            def log_message(self, *a):
+                pass
+
+        srv = HTTPServer(("127.0.0.1", 0), H)
+        port = srv.server_address[1]
+        threading.Thread(target=srv.serve_forever, daemon=True).start()
+        old = {k: os.environ.get(k) for k in
+               ("MODEL_BASE_URL", "MODEL_API_KEY")}
+        os.environ["MODEL_BASE_URL"] = f"http://127.0.0.1:{port}/v1"
+        os.environ["MODEL_API_KEY"] = "k"
+        try:
+            r = run("产品特色", 30, model=ModelClient(), tools=Tools())
+            self.assertEqual(r.status, "incomplete")  # 自纠到步数上限，非崩溃
+        finally:
+            srv.shutdown()
+            srv.server_close()
+            for k, v in old.items():
+                if v is None:
+                    os.environ.pop(k, None)
+                else:
+                    os.environ[k] = v
+
+
+class TestToolInputHardening(unittest.TestCase):
+    """第4阶段: 工具层对 None/非法类型输入的加固（同类调用点一并覆盖）。"""
+
+    def test_check_rules_null_values_no_crash(self):
+        t = Tools()
+        cases = [
+            {"shots": [{"index": 1, "duration": 4, "cites": ["P01"],
+                        "narration": None}]},
+            {"shots": [{"index": 1, "duration": None, "cites": ["P01"],
+                        "narration": "x"}]},
+            {"shots": [{"index": 1, "duration": "4", "cites": ["P01"],
+                        "narration": "支持字幕"}]},
+            {"title": None, "shots": []},
+            None,
+            {},
+        ]
+        for c in cases:
+            r = t.check_rules(c)
+            self.assertTrue(r["ok"])  # 不崩溃即可
+
+    def test_check_rules_none_duration_counted_as_zero(self):
+        """duration=None 视为 0 → 触发单镜最短时长规则（合理拦截）。"""
+        t = Tools()
+        r = t.check_rules({"shots": [{"index": 1, "duration": None,
+                                      "cites": ["P01"], "narration": "x"}]})
+        self.assertTrue(r["blocked"])
+
+    def test_estimate_duration_invalid_inputs(self):
+        t = Tools()
+        self.assertFalse(t.estimate_duration([], 30)["ok"])
+        self.assertFalse(t.estimate_duration(None, 30)["ok"])
+        self.assertFalse(t.estimate_duration([{"duration": "abc"}], 30)["ok"])
+
+    def test_search_null_query_no_crash(self):
+        t = Tools()
+        r = t.search_materials(None)
+        self.assertTrue(r["ok"])
+
+    def test_trace_write_failure_warns_but_result_intact(self):
+        """--trace 写入失败：stderr 警告，主流程结果不受影响。"""
+        import subprocess
+        out = subprocess.run(
+            [sys.executable, "-m", "src.main", "--offline",
+             "--topic", "产品特色 支持字幕", "--duration", "30",
+             "--trace", "/nonexistent_dir/x.json"],
+            cwd=Path(__file__).resolve().parents[1],
+            capture_output=True, text=True,
+            env={**__import__("os").environ, "PYTHONDONTWRITEBYTECODE": "1"})
+        self.assertEqual(out.returncode, 0)
+        self.assertIn("warn", out.stderr)
+        self.assertIn("状态", out.stdout)
+
+
 class TestStepLimit(unittest.TestCase):
     def test_max_steps_incomplete(self):
         class Loop:

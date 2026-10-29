@@ -49,7 +49,7 @@ python -m src.main --topic "产品特色 支持字幕" --duration 5
 ## 测试
 
 ```bash
-python -m unittest discover -s tests -v        # 26 项测试
+python -m unittest discover -s tests -v        # 41 项测试
 python examples/generate_traces.py             # 重新生成 examples/ 运行记录
 python examples/verify_live_path.py            # 验证真实模型 HTTP 接入契约
 ```

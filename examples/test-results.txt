@@ -1,3 +1,12 @@
+test_bad_shot_types_no_crash (test_agent.TestBoundaryInputs.test_bad_shot_types_no_crash)
+cites 传字符串、index 传非法值 → 不崩溃。 ... ok
+test_empty_material_library (test_agent.TestBoundaryInputs.test_empty_material_library) ... ok
+test_empty_shots_draft_rejected (test_agent.TestBoundaryInputs.test_empty_shots_draft_rejected) ... ok
+test_huge_duration_ok (test_agent.TestBoundaryInputs.test_huge_duration_ok) ... ok
+test_negative_duration_needs_more_info (test_agent.TestBoundaryInputs.test_negative_duration_needs_more_info) ... ok
+test_very_long_topic_no_crash (test_agent.TestBoundaryInputs.test_very_long_topic_no_crash) ... ok
+test_whitespace_topic_needs_more_info (test_agent.TestBoundaryInputs.test_whitespace_topic_needs_more_info) ... ok
+test_zero_duration_needs_more_info (test_agent.TestBoundaryInputs.test_zero_duration_needs_more_info) ... ok
 test_impossible_target_explicit_failure (test_agent.TestCannotSatisfy.test_impossible_target_explicit_failure)
 目标 5s 过短：压缩 MAX_REVISIONS 轮后仍超 → 明确失败 + 缺口。 ... ok
 test_every_shot_cited (test_agent.TestFactDerivation.test_every_shot_cited) ... ok
@@ -28,13 +37,23 @@ test_no_hit_returns_empty_and_all_ids (test_agent.TestMatchingPrecision.test_no_
 test_no_sliding_window_cross_hit (test_agent.TestMatchingPrecision.test_no_sliding_window_cross_hit) ... ok
 test_missing_duration (test_agent.TestMissingInfo.test_missing_duration) ... ok
 test_missing_topic (test_agent.TestMissingInfo.test_missing_topic) ... ok
+test_model_exception_returns_tool_error (test_agent.TestModelFailureFallback.test_model_exception_returns_tool_error) ... ok
+test_non_json_model_output_no_crash (test_agent.TestModelFailureFallback.test_non_json_model_output_no_crash)
+live 模型返回非 JSON → 契约违规自纠，不崩溃。 ... ok
 test_no_material_after_rewrite (test_agent.TestNoMaterial.test_no_material_after_rewrite) ... ok
 test_rewrite_then_hit (test_agent.TestRewritePath.test_rewrite_then_hit)
 无直击 → 模型改写查询「画面质量→画质」 → 命中 P02。 ... ok
 test_max_steps_incomplete (test_agent.TestStepLimit.test_max_steps_incomplete) ... ok
 test_tool_error_after_retry (test_agent.TestToolFailure.test_tool_error_after_retry) ... ok
+test_check_rules_none_duration_counted_as_zero (test_agent.TestToolInputHardening.test_check_rules_none_duration_counted_as_zero)
+duration=None 视为 0 → 触发单镜最短时长规则（合理拦截）。 ... ok
+test_check_rules_null_values_no_crash (test_agent.TestToolInputHardening.test_check_rules_null_values_no_crash) ... ok
+test_estimate_duration_invalid_inputs (test_agent.TestToolInputHardening.test_estimate_duration_invalid_inputs) ... ok
+test_search_null_query_no_crash (test_agent.TestToolInputHardening.test_search_null_query_no_crash) ... ok
+test_trace_write_failure_warns_but_result_intact (test_agent.TestToolInputHardening.test_trace_write_failure_warns_but_result_intact)
+--trace 写入失败：stderr 警告，主流程结果不受影响。 ... ok
 
 ----------------------------------------------------------------------
-Ran 26 tests in 0.016s
+Ran 41 tests in 0.653s
 
 OK

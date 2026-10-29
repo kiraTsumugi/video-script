@@ -2,7 +2,7 @@
 
 ## 测试预期 vs 实际结果
 
-全部测试：`python -m unittest discover -s tests -v` → **26 passed**（原始输出见 `examples/test-results.txt`）。
+全部测试：`python -m unittest discover -s tests -v` → **41 passed**（原始输出见 `examples/test-results.txt`）。
 
 | 用例 | 预期 | 实际 | 证据 |
 |---|---|---|---|

@@ -62,11 +62,15 @@ def run(topic: str, target_duration: int | None, audience: str = "general",
     model = model or ModelClient()
     tools = tools or Tools()
 
+    # 输入规范化与校验：空白主题、非正时长均视为信息不足（语义清晰，不误报"无法满足"）
+    topic = (topic or "").strip()
     missing = []
     if not topic:
         missing.append("主题")
     if target_duration is None:
         missing.append("目标时长")
+    elif target_duration <= 0:
+        missing.append("目标时长（需为正整数秒）")
 
     intent = json.dumps({
         "task": f"为「{topic}」生成 {target_duration} 秒短视频脚本",
@@ -82,7 +86,19 @@ def run(topic: str, target_duration: int | None, audience: str = "general",
     last_estimate: dict | None = None
 
     for step_no in range(1, MAX_STEPS + 1):
-        action = model.decide(SYSTEM_PROMPT, messages)
+        # 模型调用失败（网络/解析/超时）→ 优雅失败，不崩溃
+        try:
+            action = model.decide(SYSTEM_PROMPT, messages)
+        except Exception as e:
+            trace.append(TraceStep(step_no, "<model_error>", {}, "模型调用失败",
+                                   {"error": "model_call_failed",
+                                    "detail": str(e)[:200]}))
+            return Result(status="tool_error", topic=topic,
+                          script=current_script, checks=last_check,
+                          estimate=last_estimate,
+                          gap=[f"模型调用失败：{str(e)[:100]}"],
+                          trace=trace,
+                          final={"reason": "模型服务不可用，未能完成任务"})
 
         if not isinstance(action, dict):
             trace.append(TraceStep(step_no, "<invalid>", {}, "模型返回非结构化输出",
@@ -169,7 +185,8 @@ def _dispatch_tool(tools: Tools, name: str, args: dict,
                    current_script: Script | None,
                    target_duration: int | None) -> dict:
     if name == "search_materials":
-        return tools.search_materials(args.get("query", ""))
+        # 查询值可能为 null/数字等非字符串（真实模型常见）——统一转字符串
+        return tools.search_materials(str(args.get("query") or ""))
     if name == "estimate_duration":
         # 循环层强制使用当前脚本——不接受模型传入的任意 shots（防绕过）
         if current_script is None:
@@ -201,10 +218,17 @@ def _build_script(args: dict, topic: str, target: int | None,
             duration = int(s.get("duration", 0))
         except (TypeError, ValueError):
             return None, "bad_duration"
-        shots.append(Shot(index=int(s.get("index", i)), duration=duration,
+        try:
+            index = int(s.get("index", i))
+        except (TypeError, ValueError):
+            index = i  # 非法 index 不崩溃，用序号兜底
+        cites = s.get("cites", []) or []
+        if isinstance(cites, str):  # 字符串误传不炸成单字列表
+            cites = [cites]
+        shots.append(Shot(index=index, duration=duration,
                           visual=str(s.get("visual", "")),
                           narration=str(s.get("narration", "")),
-                          cites=list(s.get("cites", []) or [])))
+                          cites=list(cites)))
     title = args.get("title") or (prev.title if prev else f"{topic}脚本")
     script = Script(title=title, topic=topic,
                     target_duration=target if target is not None else 0,
