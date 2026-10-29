@@ -162,12 +162,14 @@ class OfflineMock:
                 return {"action": "finish", "status": "cannot_satisfy",
                         "reason": "规则违规修正后仍不通过，无法满足",
                         "gap": ["存在无法自动修正的规则违规，请人工调整"]}
+            title = OfflineMock._fix_title(script.get("title", ""),
+                                           check["violations"])
             fixed = OfflineMock._fix_violations(script["shots"],
                                                 check["violations"])
             return {"action": "revise_script",
-                    "args": {"title": script["title"], "shots": fixed,
+                    "args": {"title": title, "shots": fixed,
                              "reason": "修正规则违规"},
-                    "reason": "观察到规则违规，修正旁白后重新检查"}
+                    "reason": "观察到规则违规，修正标题与旁白后重新检查"}
 
         # 步骤5：收尾（检查干净才允许 generated——由循环层守卫强制）
         return {"action": "finish", "status": "generated",
@@ -223,16 +225,14 @@ class OfflineMock:
 
     @staticmethod
     def _fix_violations(shots, violations) -> list[dict]:
-        """按违规事实修正旁白：无依据的数值与效果词从旁白中移除。
-
-        修正后旁白只保留有素材事实支撑的内容（效果词与数值一起删除，
-        避免留下"效率提升"半句）。
-        """
+        """按违规事实修正分镜：无依据的数值/效果词从旁白移除，
+        违禁词从旁白与画面描述一并移除——否则复检仍会命中。"""
         import re as _re
         out = []
         for s in shots:
             ns = dict(s)
             n = str(ns.get("narration", ""))
+            vis = str(ns.get("visual", ""))
             for v in violations:
                 detail = v.get("detail", "")
                 m = _re.search(r"「([^」]+)」", detail)
@@ -240,19 +240,34 @@ class OfflineMock:
                     continue
                 bad = m.group(1)
                 if v["rule_id"] == "R_GROUNDED_NUMBER":
-                    # 删除该数值（含可能的百分号/单位短语）
+                    # 删除该数值（含可能的百分号）
                     n = _re.sub(_re.escape(bad) + r"%?", "", n)
                 elif v["rule_id"] == "R_GROUNDED_EFFECT":
                     # 删除"效果词"到下一个标点为止的短语
                     n = _re.sub(_re.escape(bad) + r"[^，。！？]*", "", n)
                 elif v["rule_id"] == "R_BANNED_WORDS":
                     n = n.replace(bad, "")
+                    vis = vis.replace(bad, "")
                 elif v["rule_id"] == "R_REQUIRE_CITE":
-                    pass  # 补引用在循环外统一处理（由命中素材回填）
+                    pass  # 补引用由起草阶段保证
             n = n.strip("，。！？ ").strip()
             ns["narration"] = n or "产品功能展示"
+            ns["visual"] = vis.strip() or "产品展示画面"
             out.append(ns)
         return out
+
+    @staticmethod
+    def _fix_title(title: str, violations) -> str:
+        """按违规事实修正标题：移除违禁词。"""
+        out = title
+        for v in violations:
+            if v["rule_id"] != "R_BANNED_WORDS":
+                continue
+            import re as _re
+            m = _re.search(r"「([^」]+)」", v.get("detail", ""))
+            if m:
+                out = out.replace(m.group(1), "")
+        return out.strip("｜| 　") or title
 
     @staticmethod
     def _rewrite(topic: str) -> str:
@@ -274,6 +289,8 @@ class OfflineMock:
         drafts, revisions = [], []
         script = {"title": "", "shots": []}
         need_reestimate = False
+        compress_count = 0
+        fix_count = 0
         for m in messages:
             if m.get("role") == "assistant":
                 try:
@@ -286,12 +303,17 @@ class OfflineMock:
                     script = dict(a.get("args", {}))
                     need_reestimate = False
                 elif name == "revise_script":
-                    revisions.append(a.get("args", {}))
-                    script = dict(a.get("args", {}))
+                    args = a.get("args", {})
+                    revisions.append(args)
+                    script = dict(args)
                     need_reestimate = True
                     # 修正后旧检查/旧估算作废——必须基于新脚本重新执行
                     checks = []
                     estimates = []
+                    if "压缩" in str(args.get("reason", "")):
+                        compress_count += 1
+                    else:
+                        fix_count += 1
                 elif name == "estimate_duration":
                     need_reestimate = False
             if m.get("role") in ("tool", "user"):
@@ -315,5 +337,5 @@ class OfflineMock:
                 "searches": searches, "estimates": estimates, "checks": checks,
                 "drafts": drafts, "revisions": revisions, "script": script,
                 "need_reestimate": need_reestimate,
-                "compressions": len(revisions),
-                "fixes": len(revisions)}
+                "compressions": compress_count,
+                "fixes": fix_count}

@@ -1,0 +1,594 @@
+{
+  "case": "rule_violation",
+  "description": "规则违规链：P05违禁词→检查拦截→修正标题与旁白→重检通过",
+  "topic": "世界级音质",
+  "target_duration": 30,
+  "model_mode": "offline-mock",
+  "status": "generated",
+  "gap": [],
+  "final": {
+    "action": "finish",
+    "status": "generated",
+    "reason": "脚本通过全部检查，总时长 28s",
+    "gap": []
+  },
+  "script": {
+    "title": "音质｜30秒短片",
+    "topic": "世界级音质",
+    "target_duration": 30,
+    "shots": [
+      {
+        "index": 1,
+        "duration": 3,
+        "visual": "开场：音质产品亮相",
+        "narration": "先看产品亮点",
+        "cites": [
+          "P05"
+        ]
+      },
+      {
+        "index": 2,
+        "duration": 9,
+        "visual": "特写：音质功能演示",
+        "narration": "音质",
+        "cites": [
+          "P05"
+        ]
+      },
+      {
+        "index": 3,
+        "duration": 9,
+        "visual": "演示：音质使用场景",
+        "narration": "功能细节演示",
+        "cites": [
+          "P05"
+        ]
+      },
+      {
+        "index": 4,
+        "duration": 7,
+        "visual": "收尾：产品 LOGO 与引导关注",
+        "narration": "更多内容请关注后续",
+        "cites": [
+          "P05"
+        ]
+      }
+    ],
+    "total_duration": 28
+  },
+  "estimate": {
+    "ok": true,
+    "total_duration": 28,
+    "target_duration": 30,
+    "over_target": false,
+    "overflow": 0,
+    "shot_durations": [
+      3,
+      9,
+      9,
+      7
+    ]
+  },
+  "checks": {
+    "ok": true,
+    "violations": [],
+    "blocked": false,
+    "block_count": 0
+  },
+  "trace": [
+    {
+      "n": 1,
+      "action": "search_materials",
+      "args": {
+        "query": "世界级音质"
+      },
+      "reason": "检索产品素材",
+      "observation": {
+        "ok": true,
+        "query": "世界级音质",
+        "segments": [
+          "世界级音质"
+        ],
+        "hits": [
+          {
+            "id": "P05",
+            "name": "外部投放素材（第三方提供）",
+            "facts": [
+              "世界级音质"
+            ],
+            "matched_facts": [
+              "世界级音质"
+            ]
+          }
+        ],
+        "all_material_ids": [
+          "P01",
+          "P02",
+          "P03",
+          "P04",
+          "P05"
+        ]
+      }
+    },
+    {
+      "n": 2,
+      "action": "draft_script",
+      "args": {
+        "title": "世界级音质｜30秒短片",
+        "shots": [
+          {
+            "index": 1,
+            "duration": 4,
+            "visual": "开场：世界级音质产品亮相",
+            "narration": "先看产品亮点",
+            "cites": [
+              "P05"
+            ]
+          },
+          {
+            "index": 2,
+            "duration": 12,
+            "visual": "特写：世界级音质功能演示",
+            "narration": "世界级音质",
+            "cites": [
+              "P05"
+            ]
+          },
+          {
+            "index": 3,
+            "duration": 12,
+            "visual": "演示：世界级音质使用场景",
+            "narration": "功能细节演示",
+            "cites": [
+              "P05"
+            ]
+          },
+          {
+            "index": 4,
+            "duration": 10,
+            "visual": "收尾：产品 LOGO 与引导关注",
+            "narration": "更多内容请关注后续",
+            "cites": [
+              "P05"
+            ]
+          }
+        ]
+      },
+      "reason": "依据 1 条命中素材起草脚本（旁白取自素材事实，首稿待估算）",
+      "observation": {
+        "ok": true,
+        "script_saved": true,
+        "total_duration": 38,
+        "shot_count": 4
+      }
+    },
+    {
+      "n": 3,
+      "action": "estimate_duration",
+      "args": {
+        "shots": [
+          {
+            "index": 1,
+            "duration": 4,
+            "visual": "开场：世界级音质产品亮相",
+            "narration": "先看产品亮点",
+            "cites": [
+              "P05"
+            ]
+          },
+          {
+            "index": 2,
+            "duration": 12,
+            "visual": "特写：世界级音质功能演示",
+            "narration": "世界级音质",
+            "cites": [
+              "P05"
+            ]
+          },
+          {
+            "index": 3,
+            "duration": 12,
+            "visual": "演示：世界级音质使用场景",
+            "narration": "功能细节演示",
+            "cites": [
+              "P05"
+            ]
+          },
+          {
+            "index": 4,
+            "duration": 10,
+            "visual": "收尾：产品 LOGO 与引导关注",
+            "narration": "更多内容请关注后续",
+            "cites": [
+              "P05"
+            ]
+          }
+        ],
+        "target": 30
+      },
+      "reason": "估算总时长并检查是否超目标",
+      "observation": {
+        "ok": true,
+        "total_duration": 38,
+        "target_duration": 30,
+        "over_target": true,
+        "overflow": 8,
+        "shot_durations": [
+          4,
+          12,
+          12,
+          10
+        ]
+      }
+    },
+    {
+      "n": 4,
+      "action": "revise_script",
+      "args": {
+        "title": "世界级音质｜30秒短片",
+        "shots": [
+          {
+            "index": 1,
+            "duration": 3,
+            "visual": "开场：世界级音质产品亮相",
+            "narration": "先看产品亮点",
+            "cites": [
+              "P05"
+            ]
+          },
+          {
+            "index": 2,
+            "duration": 9,
+            "visual": "特写：世界级音质功能演示",
+            "narration": "世界级音质",
+            "cites": [
+              "P05"
+            ]
+          },
+          {
+            "index": 3,
+            "duration": 9,
+            "visual": "演示：世界级音质使用场景",
+            "narration": "功能细节演示",
+            "cites": [
+              "P05"
+            ]
+          },
+          {
+            "index": 4,
+            "duration": 7,
+            "visual": "收尾：产品 LOGO 与引导关注",
+            "narration": "更多内容请关注后续",
+            "cites": [
+              "P05"
+            ]
+          }
+        ],
+        "reason": "总时长 38s 超目标 30s（超出 8s），压缩分镜"
+      },
+      "reason": "观察到超时长 38s > 30s，压缩各镜时长后重新估算",
+      "observation": {
+        "ok": true,
+        "script_saved": true,
+        "total_duration": 28,
+        "shot_count": 4
+      }
+    },
+    {
+      "n": 5,
+      "action": "estimate_duration",
+      "args": {
+        "shots": [
+          {
+            "index": 1,
+            "duration": 3,
+            "visual": "开场：世界级音质产品亮相",
+            "narration": "先看产品亮点",
+            "cites": [
+              "P05"
+            ]
+          },
+          {
+            "index": 2,
+            "duration": 9,
+            "visual": "特写：世界级音质功能演示",
+            "narration": "世界级音质",
+            "cites": [
+              "P05"
+            ]
+          },
+          {
+            "index": 3,
+            "duration": 9,
+            "visual": "演示：世界级音质使用场景",
+            "narration": "功能细节演示",
+            "cites": [
+              "P05"
+            ]
+          },
+          {
+            "index": 4,
+            "duration": 7,
+            "visual": "收尾：产品 LOGO 与引导关注",
+            "narration": "更多内容请关注后续",
+            "cites": [
+              "P05"
+            ]
+          }
+        ],
+        "target": 30
+      },
+      "reason": "估算总时长并检查是否超目标",
+      "observation": {
+        "ok": true,
+        "total_duration": 28,
+        "target_duration": 30,
+        "over_target": false,
+        "overflow": 0,
+        "shot_durations": [
+          3,
+          9,
+          9,
+          7
+        ]
+      }
+    },
+    {
+      "n": 6,
+      "action": "check_rules",
+      "args": {
+        "script": {
+          "shots": [
+            {
+              "index": 1,
+              "duration": 3,
+              "visual": "开场：世界级音质产品亮相",
+              "narration": "先看产品亮点",
+              "cites": [
+                "P05"
+              ]
+            },
+            {
+              "index": 2,
+              "duration": 9,
+              "visual": "特写：世界级音质功能演示",
+              "narration": "世界级音质",
+              "cites": [
+                "P05"
+              ]
+            },
+            {
+              "index": 3,
+              "duration": 9,
+              "visual": "演示：世界级音质使用场景",
+              "narration": "功能细节演示",
+              "cites": [
+                "P05"
+              ]
+            },
+            {
+              "index": 4,
+              "duration": 7,
+              "visual": "收尾：产品 LOGO 与引导关注",
+              "narration": "更多内容请关注后续",
+              "cites": [
+                "P05"
+              ]
+            }
+          ]
+        }
+      },
+      "reason": "检查品牌规则与事实依据",
+      "observation": {
+        "ok": true,
+        "violations": [
+          {
+            "rule_id": "R_BANNED_WORDS",
+            "desc": "不得使用广告法违禁词",
+            "severity": "block",
+            "detail": "标题出现违禁词「世界级」",
+            "shot_index": null
+          },
+          {
+            "rule_id": "R_BANNED_WORDS",
+            "desc": "不得使用广告法违禁词",
+            "severity": "block",
+            "detail": "第1镜出现违禁词「世界级」",
+            "shot_index": 1
+          },
+          {
+            "rule_id": "R_BANNED_WORDS",
+            "desc": "不得使用广告法违禁词",
+            "severity": "block",
+            "detail": "第2镜出现违禁词「世界级」",
+            "shot_index": 2
+          },
+          {
+            "rule_id": "R_BANNED_WORDS",
+            "desc": "不得使用广告法违禁词",
+            "severity": "block",
+            "detail": "第3镜出现违禁词「世界级」",
+            "shot_index": 3
+          }
+        ],
+        "blocked": true,
+        "block_count": 4
+      }
+    },
+    {
+      "n": 7,
+      "action": "revise_script",
+      "args": {
+        "title": "音质｜30秒短片",
+        "shots": [
+          {
+            "index": 1,
+            "duration": 3,
+            "visual": "开场：音质产品亮相",
+            "narration": "先看产品亮点",
+            "cites": [
+              "P05"
+            ]
+          },
+          {
+            "index": 2,
+            "duration": 9,
+            "visual": "特写：音质功能演示",
+            "narration": "音质",
+            "cites": [
+              "P05"
+            ]
+          },
+          {
+            "index": 3,
+            "duration": 9,
+            "visual": "演示：音质使用场景",
+            "narration": "功能细节演示",
+            "cites": [
+              "P05"
+            ]
+          },
+          {
+            "index": 4,
+            "duration": 7,
+            "visual": "收尾：产品 LOGO 与引导关注",
+            "narration": "更多内容请关注后续",
+            "cites": [
+              "P05"
+            ]
+          }
+        ],
+        "reason": "修正规则违规"
+      },
+      "reason": "观察到规则违规，修正标题与旁白后重新检查",
+      "observation": {
+        "ok": true,
+        "script_saved": true,
+        "total_duration": 28,
+        "shot_count": 4
+      }
+    },
+    {
+      "n": 8,
+      "action": "estimate_duration",
+      "args": {
+        "shots": [
+          {
+            "index": 1,
+            "duration": 3,
+            "visual": "开场：音质产品亮相",
+            "narration": "先看产品亮点",
+            "cites": [
+              "P05"
+            ]
+          },
+          {
+            "index": 2,
+            "duration": 9,
+            "visual": "特写：音质功能演示",
+            "narration": "音质",
+            "cites": [
+              "P05"
+            ]
+          },
+          {
+            "index": 3,
+            "duration": 9,
+            "visual": "演示：音质使用场景",
+            "narration": "功能细节演示",
+            "cites": [
+              "P05"
+            ]
+          },
+          {
+            "index": 4,
+            "duration": 7,
+            "visual": "收尾：产品 LOGO 与引导关注",
+            "narration": "更多内容请关注后续",
+            "cites": [
+              "P05"
+            ]
+          }
+        ],
+        "target": 30
+      },
+      "reason": "估算总时长并检查是否超目标",
+      "observation": {
+        "ok": true,
+        "total_duration": 28,
+        "target_duration": 30,
+        "over_target": false,
+        "overflow": 0,
+        "shot_durations": [
+          3,
+          9,
+          9,
+          7
+        ]
+      }
+    },
+    {
+      "n": 9,
+      "action": "check_rules",
+      "args": {
+        "script": {
+          "shots": [
+            {
+              "index": 1,
+              "duration": 3,
+              "visual": "开场：音质产品亮相",
+              "narration": "先看产品亮点",
+              "cites": [
+                "P05"
+              ]
+            },
+            {
+              "index": 2,
+              "duration": 9,
+              "visual": "特写：音质功能演示",
+              "narration": "音质",
+              "cites": [
+                "P05"
+              ]
+            },
+            {
+              "index": 3,
+              "duration": 9,
+              "visual": "演示：音质使用场景",
+              "narration": "功能细节演示",
+              "cites": [
+                "P05"
+              ]
+            },
+            {
+              "index": 4,
+              "duration": 7,
+              "visual": "收尾：产品 LOGO 与引导关注",
+              "narration": "更多内容请关注后续",
+              "cites": [
+                "P05"
+              ]
+            }
+          ]
+        }
+      },
+      "reason": "检查品牌规则与事实依据",
+      "observation": {
+        "ok": true,
+        "violations": [],
+        "blocked": false,
+        "block_count": 0
+      }
+    },
+    {
+      "n": 10,
+      "action": "finish",
+      "args": {},
+      "reason": "脚本通过全部检查，总时长 28s",
+      "observation": {
+        "finished": true,
+        "status": "generated"
+      }
+    }
+  ]
+}

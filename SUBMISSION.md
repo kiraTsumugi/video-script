@@ -33,7 +33,7 @@ cd video-script
 # ① 核心：正常生成 + 超时长修正闭环（每步 动作→观察→决策依据）
 python -m src.main --topic "产品特色 支持字幕" --duration 30 -v
 
-# ② 全量测试（24 项）
+# ② 全量测试（26 项）
 python -m unittest discover -s tests -v
 ```
 
@@ -57,9 +57,10 @@ python -m unittest discover -s tests -v
 | 无素材（彻底无果） | `--topic "完全无关主题xyz"` | `no_material` | `examples/trace_no_material.json` |
 | 缺关键信息（主题/时长） | 省略对应参数 | `needs_more_info` | `trace_missing_topic/duration.json` |
 | 工具失败 | `--topic "触发故障的查询"` | `tool_error`（重试一次后明确失败） | `examples/trace_tool_failure.json` |
+| 规则违规→修正→重检 | `--topic "世界级音质"` | 拦截→修正标题/旁白→重检通过 | `examples/trace_rule_violation.json` |
 | 超时长修正失败 | `--duration 5` | `cannot_satisfy` + 缺口 | `examples/trace_cannot_satisfy.json` |
 
-完整测试：**24 项**，`python -m unittest discover -s tests -v` 全绿（输出见 `examples/test-results.txt`）。
+完整测试：**26 项**，`python -m unittest discover -s tests -v` 全绿（输出见 `examples/test-results.txt`）。
 
 ## ReAct 决策证据（两条不同路径）
 
@@ -78,14 +79,29 @@ step7 finish(generated) → 总时长 28s
 **路径 B · 目标宽松不修正**（`trace_within_target.json`）：step3 估算 38s ≤ 45s 达标 →
 **直接进入检查**，无 revise 动作。同一段循环代码因估算事实不同走出不同决策。
 
+**路径 C · 规则违规修正**（`trace_rule_violation.json`，10 步）：检索 P05（自带违禁词素材）
+→ 起草 → 压缩超时长 → **检查观察到违禁词违规** → 修正标题与旁白 → **重新估算+重新检查** →
+生成。规则修正链由真实素材（P05）触发，非死代码。
+
 ## 安全设计（防编造产品事实：关键缺陷防线）
 
 1. **数据层**：P01 facts 仅"支持字幕"，无任何效果数据。
 2. **规则层**：`R_GROUNDED_NUMBER`/`R_GROUNDED_EFFECT` 逐字核对——旁白中的数值与效果词
-   （提升/提高/降低…）必须能在引用素材 facts 中找到依据，否则 block。测试：
-   "效率提升 80%" 被拦截（`tests::TestGuards`）。
-3. **循环层守卫**：`finish(generated)` 要求"有脚本 + 最后一次检查干净"，否则拦截为
-   `incomplete`——不信任模型自律，结构保证。
+   （提升/提高/降低…）必须能在引用素材 facts 中找到依据，否则 block；
+   `R_BANNED_WORDS` 覆盖**标题+画面+旁白**所有输出位置。测试：
+   "效率提升 80%" 被拦截、P05"世界级"全链路清除（`tests::TestGuards`、`TestMatchingPrecision::test_illegal_material_blocks_and_fixes`）。
+3. **循环层守卫**：`finish(generated)` 要求"有脚本 + 最后一次检查干净"，且
+   **估算/检查强制作用于循环内当前脚本**（不接受模型传入的任意脚本，防"检查干净版、输出脏版本"绕过）。
+4. **修正计数解耦**：压缩与规则修正分别计数（各上限 2 轮），组合场景不会提前误判失败。
+
+## 第 3 阶段补充：核心业务链路打通记录
+
+| 问题（第 3 阶段发现） | 修复 |
+|---|---|
+| 规则违规→修正→重检链路是死代码（素材全合规，`_fix_violations` 不可达） | 新增 P05 素材（自带违禁词"世界级"），使该链路由真实数据触发并被 trace 记录 |
+| 违禁词检查漏了标题与画面描述（修正后仍残留） | `check_rules` 覆盖标题+画面+旁白；`_fix_violations`/`_fix_title` 同步清理 |
+| 估算/检查可被模型参数绕过（检查 A 版、输出 B 版） | 循环层强制用当前脚本执行估算/检查 |
+| 压缩与规则修正共用一个计数器 | 解耦为 `compressions`/`fixes` 独立计数 |
 
 ## 已知限制（诚实声明）
 
@@ -109,7 +125,7 @@ src/agent/tools.py     工具层（检索/估算/检查；只返回事实）
 src/agent/llm.py       模型接入（OpenAI 兼容 + 确定性离线 Mock；事实派生起草）
 src/agent/react_loop.py ReAct 循环（步数上限 12；generated 守卫）
 src/main.py            CLI 入口
-tests/test_agent.py    24 项可执行测试
+tests/test_agent.py    26 项可执行测试
 examples/              运行记录（8 组 Trace + CLI 输出 + 测试输出 + INDEX）+ 生成/验证脚本
 data/                  合成产品素材（P01-P04）+ 品牌规则 + 改写知识表
 ```

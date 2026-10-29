@@ -2,7 +2,7 @@
 
 ## 测试预期 vs 实际结果
 
-全部测试：`python -m unittest discover -s tests -v` → **24 passed**（原始输出见 `examples/test-results.txt`）。
+全部测试：`python -m unittest discover -s tests -v` → **26 passed**（原始输出见 `examples/test-results.txt`）。
 
 | 用例 | 预期 | 实际 | 证据 |
 |---|---|---|---|
@@ -19,6 +19,7 @@
 | 修正失败明确 | 2 轮压缩后 `cannot_satisfy`+缺口 | ✅ | `examples/trace_cannot_satisfy.json` |
 | 素材替换脚本变化 | 旁白随数据变，无旧内容 | ✅ | `tests::TestFactDerivation` |
 | 匹配不过宽 | "支持字母" 0 命中 | ✅ | `tests::TestMatchingPrecision` |
+| 规则违规→修正→重检 | P05 违禁词素材：拦截→修正标题/旁白→重检通过 | ✅ | `examples/trace_rule_violation.json` |
 | 生成守卫 ×2 | 无检查/违规未修 → 拦截 incomplete | ✅ | `tests::TestGuards` |
 | 畸形输出 ×2 | 不崩溃 | ✅ | `tests::TestMalformedOutput` |
 
@@ -38,6 +39,20 @@ step7 finish(generated) → 总时长 28s
 
 **路径 B · 达标不修正**（`trace_within_target.json`）：step3 估算 38s ≤ 45s →
 直接进入检查，**无 revise 动作**。同一段循环代码因估算事实不同走出不同决策。
+
+**路径 C · 规则违规修正**（`trace_rule_violation.json`，10 步）：
+
+```
+step1-5  检索P05(世界级音质) → 起草 → 估算38s超时长 → 压缩 → 重估28s
+step6  check_rules → blocked: 标题/第1镜违禁词「世界级」  ← 观察到规则违规事实
+step7  revise_script → 修正：标题与画面/旁白移除违禁词
+step8  estimate_duration → 28s 仍达标（修正不破坏时长约束）
+step9  check_rules → 0 违规 ✓                            ← 修正后重新检查
+step10 finish(generated)
+```
+
+三条路径（超时长压缩 / 达标直通 / 规则修正）由不同工具事实驱动，
+同一段循环代码走出三种决策序列。
 
 ## 评审三点修复的验证
 

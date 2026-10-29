@@ -123,7 +123,7 @@ def run(topic: str, target_duration: int | None, audience: str = "general",
 
         # 工具动作
         if name in TOOL_ACTIONS:
-            obs = _dispatch_tool(tools, name, args)
+            obs = _dispatch_tool(tools, name, args, current_script, target_duration)
             if name == "estimate_duration" and obs.get("ok"):
                 last_estimate = obs
             if name == "check_rules" and obs.get("ok"):
@@ -165,14 +165,26 @@ def run(topic: str, target_duration: int | None, audience: str = "general",
                   final={"reason": f"达到最大步数 {MAX_STEPS} 仍未完成"})
 
 
-def _dispatch_tool(tools: Tools, name: str, args: dict) -> dict:
+def _dispatch_tool(tools: Tools, name: str, args: dict,
+                   current_script: Script | None,
+                   target_duration: int | None) -> dict:
     if name == "search_materials":
         return tools.search_materials(args.get("query", ""))
     if name == "estimate_duration":
-        return tools.estimate_duration(args.get("shots", []),
-                                       args.get("target", 0))
+        # 循环层强制使用当前脚本——不接受模型传入的任意 shots（防绕过）
+        if current_script is None:
+            return {"ok": False, "error": "no_script",
+                    "message": "尚未产出脚本，无法估算"}
+        shots = [s.to_dict() for s in current_script.shots]
+        return tools.estimate_duration(shots, target_duration or 0)
     if name == "check_rules":
-        return tools.check_rules(args.get("script", {}))
+        # 同上：检查对象必须是当前脚本（含标题），确保"检查通过"与"输出内容"是同一份
+        if current_script is None:
+            return {"ok": False, "error": "no_script",
+                    "message": "尚未产出脚本，无法检查"}
+        return tools.check_rules({
+            "title": current_script.title,
+            "shots": [s.to_dict() for s in current_script.shots]})
     return {"ok": False, "error": "unknown_action", "action": name}
 
 

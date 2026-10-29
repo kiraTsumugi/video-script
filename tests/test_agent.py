@@ -125,7 +125,27 @@ class TestMatchingPrecision(unittest.TestCase):
         t = Tools()
         r = t.search_materials("完全无关主题xyz")
         self.assertEqual(r["hits"], [])
-        self.assertEqual(r["all_material_ids"], ["P01", "P02", "P03", "P04"])
+        self.assertEqual(r["all_material_ids"],
+                         ["P01", "P02", "P03", "P04", "P05"])
+
+    def test_illegal_material_blocks_and_fixes(self):
+        """P05 自带违禁词素材：命中 → 起草违规 → 修正 → 重检通过。"""
+        r, _ = go("世界级音质", 30)
+        self.assertEqual(r.status, "generated")
+        acts = [s.action for s in r.trace]
+        # 规则违规链：check(blocked) → revise → estimate → check(clean) → finish
+        self.assertEqual(acts.count("check_rules"), 2)
+        self.assertEqual(acts.count("revise_script"), 2)  # 1 压缩 + 1 规则修正
+        # 违禁词不得残留在标题/画面/旁白任何位置
+        self.assertNotIn("世界级", r.script.title)
+        for s in r.script.shots:
+            self.assertNotIn("世界级", s.narration)
+            self.assertNotIn("世界级", s.visual)
+
+    def test_illegal_material_fix_respects_budget(self):
+        """规则修正不得破坏时长约束：修正后总时长仍在目标内。"""
+        r, _ = go("世界级音质", 30)
+        self.assertLessEqual(r.script.total_duration, 30)
 
 
 class TestRewritePath(unittest.TestCase):

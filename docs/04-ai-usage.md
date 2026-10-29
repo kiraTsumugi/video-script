@@ -8,7 +8,7 @@
 | 数据结构设计 | 是 | Shot.cites 事实可追溯；状态正交 |
 | 代码实现 | 是 | src/ 全部初稿由 AI（Claude Code）生成 |
 | 修正闭环设计 | 是 | 压缩→重估；修正后作废旧检查 |
-| 测试编写 | 是 | tests/ 24 项由 AI 生成 |
+| 测试编写 | 是 | tests/ 26 项由 AI 生成 |
 | 运行验证 | 是 | 本地实际执行，见下 |
 | 文档撰写 | 是 | docs/ 由 AI 生成 |
 
@@ -30,7 +30,7 @@
 
 ## 验证记录
 
-- `python -m unittest discover -s tests -v` → 24 passed（本地实跑，输出落盘 `examples/test-results.txt`）
+- `python -m unittest discover -s tests -v` → 26 passed（本地实跑，输出落盘 `examples/test-results.txt`）
 - `python examples/generate_traces.py` → 8 组 Trace 落盘（本地实跑）
 - `python examples/verify_live_path.py` → HTTP 契约通过（本地实跑）
 - 换素材测试：P01 改"支持手势控制"→ 脚本旁白随之变、无旧内容残留

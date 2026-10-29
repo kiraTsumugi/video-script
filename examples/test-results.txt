@@ -20,6 +20,10 @@ test_within_target_no_revision (test_agent.TestMainFlow.test_within_target_no_re
 test_non_dict_no_crash (test_agent.TestMalformedOutput.test_non_dict_no_crash) ... ok
 test_unknown_action_no_crash (test_agent.TestMalformedOutput.test_unknown_action_no_crash) ... ok
 test_exact_fact_hit (test_agent.TestMatchingPrecision.test_exact_fact_hit) ... ok
+test_illegal_material_blocks_and_fixes (test_agent.TestMatchingPrecision.test_illegal_material_blocks_and_fixes)
+P05 自带违禁词素材：命中 → 起草违规 → 修正 → 重检通过。 ... ok
+test_illegal_material_fix_respects_budget (test_agent.TestMatchingPrecision.test_illegal_material_fix_respects_budget)
+规则修正不得破坏时长约束：修正后总时长仍在目标内。 ... ok
 test_no_hit_returns_empty_and_all_ids (test_agent.TestMatchingPrecision.test_no_hit_returns_empty_and_all_ids) ... ok
 test_no_sliding_window_cross_hit (test_agent.TestMatchingPrecision.test_no_sliding_window_cross_hit) ... ok
 test_missing_duration (test_agent.TestMissingInfo.test_missing_duration) ... ok
@@ -31,6 +35,6 @@ test_max_steps_incomplete (test_agent.TestStepLimit.test_max_steps_incomplete) .
 test_tool_error_after_retry (test_agent.TestToolFailure.test_tool_error_after_retry) ... ok
 
 ----------------------------------------------------------------------
-Ran 24 tests in 0.014s
+Ran 26 tests in 0.016s
 
 OK

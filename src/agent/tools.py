@@ -123,12 +123,18 @@ class Tools:
                                 f"第{s.get('index')}镜效果宣称「{w}」无素材依据",
                                 s.get("index")))
             elif t == "banned_words":
+                # 输出任何位置都不得残留违禁词：逐镜（旁白+画面）与标题
+                for w in r["words"]:
+                    if w in script.get("title", ""):
+                        violations.append(Violation(
+                            r["id"], r["desc"], r["severity"],
+                            f"标题出现违禁词「{w}」"))
                 for s in shots:
                     for w in r["words"]:
-                        if w in s.get("narration", ""):
+                        if w in s.get("narration", "") or w in s.get("visual", ""):
                             violations.append(Violation(
                                 r["id"], r["desc"], r["severity"],
-                                f"第{s.get('index')}镜违禁词「{w}」", s.get("index")))
+                                f"第{s.get('index')}镜出现违禁词「{w}」", s.get("index")))
             elif t == "max_shots":
                 if len(shots) > r["value"]:
                     violations.append(Violation(

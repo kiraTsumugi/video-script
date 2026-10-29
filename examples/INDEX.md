@@ -5,6 +5,7 @@
 | normal | 正常生成：首估38s超时长→压缩→28s（参考实例） | `generated` | [trace_normal.json](trace_normal.json) | [run_normal.txt](run_normal.txt) |
 | within_target | 目标宽松：38s达标，无修正动作 | `generated` | [trace_within_target.json](trace_within_target.json) | [run_within_target.txt](run_within_target.txt) |
 | rewrite_hit | 无直击→改写查询「画质」→命中P02→生成 | `generated` | [trace_rewrite_hit.json](trace_rewrite_hit.json) | [run_rewrite_hit.txt](run_rewrite_hit.txt) |
+| rule_violation | 规则违规链：P05违禁词→检查拦截→修正标题与旁白→重检通过 | `generated` | [trace_rule_violation.json](trace_rule_violation.json) | [run_rule_violation.txt](run_rule_violation.txt) |
 | missing_topic | 缺主题 | `needs_more_info` | [trace_missing_topic.json](trace_missing_topic.json) | [run_missing_topic.txt](run_missing_topic.txt) |
 | missing_duration | 缺目标时长 | `needs_more_info` | [trace_missing_duration.json](trace_missing_duration.json) | [run_missing_duration.txt](run_missing_duration.txt) |
 | no_material | 无素材：改写后仍无命中 | `no_material` | [trace_no_material.json](trace_no_material.json) | [run_no_material.txt](run_no_material.txt) |
