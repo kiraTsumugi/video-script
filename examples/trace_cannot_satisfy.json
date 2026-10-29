@@ -1,0 +1,458 @@
+{
+  "case": "cannot_satisfy",
+  "description": "目标5s过短：压缩2轮仍21s，明确失败+缺口",
+  "topic": "产品特色 支持字幕",
+  "target_duration": 5,
+  "model_mode": "offline-mock",
+  "status": "cannot_satisfy",
+  "gap": [
+    "目标时长 5s 过短，当前最短可行 21s，请放宽时长"
+  ],
+  "final": {
+    "action": "finish",
+    "status": "cannot_satisfy",
+    "reason": "压缩 2 轮后仍为 21s > 目标 5s，无法满足",
+    "gap": [
+      "目标时长 5s 过短，当前最短可行 21s，请放宽时长"
+    ]
+  },
+  "script": {
+    "title": "产品特色 支持字幕｜5秒短片",
+    "topic": "产品特色 支持字幕",
+    "target_duration": 5,
+    "shots": [
+      {
+        "index": 1,
+        "duration": 2,
+        "visual": "开场：产品特色 支持字幕产品亮相",
+        "narration": "先看产品亮点",
+        "cites": [
+          "P01"
+        ]
+      },
+      {
+        "index": 2,
+        "duration": 7,
+        "visual": "特写：支持字幕功能演示",
+        "narration": "支持字幕",
+        "cites": [
+          "P01"
+        ]
+      },
+      {
+        "index": 3,
+        "duration": 7,
+        "visual": "演示：支持字幕使用场景",
+        "narration": "功能细节演示",
+        "cites": [
+          "P01"
+        ]
+      },
+      {
+        "index": 4,
+        "duration": 5,
+        "visual": "收尾：产品 LOGO 与引导关注",
+        "narration": "更多内容请关注后续",
+        "cites": [
+          "P01"
+        ]
+      }
+    ],
+    "total_duration": 21
+  },
+  "estimate": {
+    "ok": true,
+    "total_duration": 21,
+    "target_duration": 5,
+    "over_target": true,
+    "overflow": 16,
+    "shot_durations": [
+      2,
+      7,
+      7,
+      5
+    ]
+  },
+  "checks": null,
+  "trace": [
+    {
+      "n": 1,
+      "action": "search_materials",
+      "args": {
+        "query": "产品特色 支持字幕"
+      },
+      "reason": "检索产品素材",
+      "observation": {
+        "ok": true,
+        "query": "产品特色 支持字幕",
+        "segments": [
+          "产品特色",
+          "支持字幕"
+        ],
+        "hits": [
+          {
+            "id": "P01",
+            "name": "产品介绍短片素材",
+            "facts": [
+              "支持字幕"
+            ],
+            "matched_facts": [
+              "支持字幕"
+            ]
+          }
+        ],
+        "all_material_ids": [
+          "P01",
+          "P02",
+          "P03",
+          "P04"
+        ]
+      }
+    },
+    {
+      "n": 2,
+      "action": "draft_script",
+      "args": {
+        "title": "产品特色 支持字幕｜5秒短片",
+        "shots": [
+          {
+            "index": 1,
+            "duration": 4,
+            "visual": "开场：产品特色 支持字幕产品亮相",
+            "narration": "先看产品亮点",
+            "cites": [
+              "P01"
+            ]
+          },
+          {
+            "index": 2,
+            "duration": 12,
+            "visual": "特写：支持字幕功能演示",
+            "narration": "支持字幕",
+            "cites": [
+              "P01"
+            ]
+          },
+          {
+            "index": 3,
+            "duration": 12,
+            "visual": "演示：支持字幕使用场景",
+            "narration": "功能细节演示",
+            "cites": [
+              "P01"
+            ]
+          },
+          {
+            "index": 4,
+            "duration": 10,
+            "visual": "收尾：产品 LOGO 与引导关注",
+            "narration": "更多内容请关注后续",
+            "cites": [
+              "P01"
+            ]
+          }
+        ]
+      },
+      "reason": "依据 1 条命中素材起草脚本（旁白取自素材事实，首稿待估算）",
+      "observation": {
+        "ok": true,
+        "script_saved": true,
+        "total_duration": 38,
+        "shot_count": 4
+      }
+    },
+    {
+      "n": 3,
+      "action": "estimate_duration",
+      "args": {
+        "shots": [
+          {
+            "index": 1,
+            "duration": 4,
+            "visual": "开场：产品特色 支持字幕产品亮相",
+            "narration": "先看产品亮点",
+            "cites": [
+              "P01"
+            ]
+          },
+          {
+            "index": 2,
+            "duration": 12,
+            "visual": "特写：支持字幕功能演示",
+            "narration": "支持字幕",
+            "cites": [
+              "P01"
+            ]
+          },
+          {
+            "index": 3,
+            "duration": 12,
+            "visual": "演示：支持字幕使用场景",
+            "narration": "功能细节演示",
+            "cites": [
+              "P01"
+            ]
+          },
+          {
+            "index": 4,
+            "duration": 10,
+            "visual": "收尾：产品 LOGO 与引导关注",
+            "narration": "更多内容请关注后续",
+            "cites": [
+              "P01"
+            ]
+          }
+        ],
+        "target": 5
+      },
+      "reason": "估算总时长并检查是否超目标",
+      "observation": {
+        "ok": true,
+        "total_duration": 38,
+        "target_duration": 5,
+        "over_target": true,
+        "overflow": 33,
+        "shot_durations": [
+          4,
+          12,
+          12,
+          10
+        ]
+      }
+    },
+    {
+      "n": 4,
+      "action": "revise_script",
+      "args": {
+        "title": "产品特色 支持字幕｜5秒短片",
+        "shots": [
+          {
+            "index": 1,
+            "duration": 3,
+            "visual": "开场：产品特色 支持字幕产品亮相",
+            "narration": "先看产品亮点",
+            "cites": [
+              "P01"
+            ]
+          },
+          {
+            "index": 2,
+            "duration": 9,
+            "visual": "特写：支持字幕功能演示",
+            "narration": "支持字幕",
+            "cites": [
+              "P01"
+            ]
+          },
+          {
+            "index": 3,
+            "duration": 9,
+            "visual": "演示：支持字幕使用场景",
+            "narration": "功能细节演示",
+            "cites": [
+              "P01"
+            ]
+          },
+          {
+            "index": 4,
+            "duration": 7,
+            "visual": "收尾：产品 LOGO 与引导关注",
+            "narration": "更多内容请关注后续",
+            "cites": [
+              "P01"
+            ]
+          }
+        ],
+        "reason": "总时长 38s 超目标 5s（超出 33s），压缩分镜"
+      },
+      "reason": "观察到超时长 38s > 5s，压缩各镜时长后重新估算",
+      "observation": {
+        "ok": true,
+        "script_saved": true,
+        "total_duration": 28,
+        "shot_count": 4
+      }
+    },
+    {
+      "n": 5,
+      "action": "estimate_duration",
+      "args": {
+        "shots": [
+          {
+            "index": 1,
+            "duration": 3,
+            "visual": "开场：产品特色 支持字幕产品亮相",
+            "narration": "先看产品亮点",
+            "cites": [
+              "P01"
+            ]
+          },
+          {
+            "index": 2,
+            "duration": 9,
+            "visual": "特写：支持字幕功能演示",
+            "narration": "支持字幕",
+            "cites": [
+              "P01"
+            ]
+          },
+          {
+            "index": 3,
+            "duration": 9,
+            "visual": "演示：支持字幕使用场景",
+            "narration": "功能细节演示",
+            "cites": [
+              "P01"
+            ]
+          },
+          {
+            "index": 4,
+            "duration": 7,
+            "visual": "收尾：产品 LOGO 与引导关注",
+            "narration": "更多内容请关注后续",
+            "cites": [
+              "P01"
+            ]
+          }
+        ],
+        "target": 5
+      },
+      "reason": "估算总时长并检查是否超目标",
+      "observation": {
+        "ok": true,
+        "total_duration": 28,
+        "target_duration": 5,
+        "over_target": true,
+        "overflow": 23,
+        "shot_durations": [
+          3,
+          9,
+          9,
+          7
+        ]
+      }
+    },
+    {
+      "n": 6,
+      "action": "revise_script",
+      "args": {
+        "title": "产品特色 支持字幕｜5秒短片",
+        "shots": [
+          {
+            "index": 1,
+            "duration": 2,
+            "visual": "开场：产品特色 支持字幕产品亮相",
+            "narration": "先看产品亮点",
+            "cites": [
+              "P01"
+            ]
+          },
+          {
+            "index": 2,
+            "duration": 7,
+            "visual": "特写：支持字幕功能演示",
+            "narration": "支持字幕",
+            "cites": [
+              "P01"
+            ]
+          },
+          {
+            "index": 3,
+            "duration": 7,
+            "visual": "演示：支持字幕使用场景",
+            "narration": "功能细节演示",
+            "cites": [
+              "P01"
+            ]
+          },
+          {
+            "index": 4,
+            "duration": 5,
+            "visual": "收尾：产品 LOGO 与引导关注",
+            "narration": "更多内容请关注后续",
+            "cites": [
+              "P01"
+            ]
+          }
+        ],
+        "reason": "总时长 28s 超目标 5s（超出 23s），压缩分镜"
+      },
+      "reason": "观察到超时长 28s > 5s，压缩各镜时长后重新估算",
+      "observation": {
+        "ok": true,
+        "script_saved": true,
+        "total_duration": 21,
+        "shot_count": 4
+      }
+    },
+    {
+      "n": 7,
+      "action": "estimate_duration",
+      "args": {
+        "shots": [
+          {
+            "index": 1,
+            "duration": 2,
+            "visual": "开场：产品特色 支持字幕产品亮相",
+            "narration": "先看产品亮点",
+            "cites": [
+              "P01"
+            ]
+          },
+          {
+            "index": 2,
+            "duration": 7,
+            "visual": "特写：支持字幕功能演示",
+            "narration": "支持字幕",
+            "cites": [
+              "P01"
+            ]
+          },
+          {
+            "index": 3,
+            "duration": 7,
+            "visual": "演示：支持字幕使用场景",
+            "narration": "功能细节演示",
+            "cites": [
+              "P01"
+            ]
+          },
+          {
+            "index": 4,
+            "duration": 5,
+            "visual": "收尾：产品 LOGO 与引导关注",
+            "narration": "更多内容请关注后续",
+            "cites": [
+              "P01"
+            ]
+          }
+        ],
+        "target": 5
+      },
+      "reason": "估算总时长并检查是否超目标",
+      "observation": {
+        "ok": true,
+        "total_duration": 21,
+        "target_duration": 5,
+        "over_target": true,
+        "overflow": 16,
+        "shot_durations": [
+          2,
+          7,
+          7,
+          5
+        ]
+      }
+    },
+    {
+      "n": 8,
+      "action": "finish",
+      "args": {},
+      "reason": "压缩 2 轮后仍为 21s > 目标 5s，无法满足",
+      "observation": {
+        "finished": true,
+        "status": "cannot_satisfy"
+      }
+    }
+  ]
+}

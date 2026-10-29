@@ -1,0 +1,5 @@
+# 本项目零第三方运行时依赖，纯 Python 标准库实现。
+# 运行要求：Python >= 3.10
+#
+# 当前无需安装任何包，直接 `python -m src.main --topic ... --duration ...` 即可运行。
+# 若后续接入 SDK（如 openai）可在此列出。

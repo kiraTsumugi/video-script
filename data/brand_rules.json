@@ -1,0 +1,52 @@
+{
+  "_comment": "品牌规则（数据驱动）。check_rules 逐条执行；severity=block 为阻断级。grounded_* 规则的核心：旁白中的数值/效果宣称必须能在被引用素材的 facts 中找到依据。",
+  "rules": [
+    {
+      "id": "R_MIN_SHOT",
+      "desc": "单镜时长不得少于 2 秒",
+      "type": "shot_min_duration",
+      "value": 2,
+      "severity": "block"
+    },
+    {
+      "id": "R_MAX_SHOT",
+      "desc": "单镜时长不得超过 15 秒",
+      "type": "shot_max_duration",
+      "value": 15,
+      "severity": "block"
+    },
+    {
+      "id": "R_REQUIRE_CITE",
+      "desc": "每个分镜必须引用至少一个素材来源",
+      "type": "require_cite",
+      "severity": "block"
+    },
+    {
+      "id": "R_GROUNDED_NUMBER",
+      "desc": "旁白中的数值必须能在引用素材事实中找到依据",
+      "type": "grounded_number",
+      "severity": "block"
+    },
+    {
+      "id": "R_GROUNDED_EFFECT",
+      "desc": "效果类宣称必须有素材事实依据",
+      "type": "grounded_effect",
+      "words": ["提升", "提高", "降低", "增长", "节省", "领先", "唯一", "最好", "更强"],
+      "severity": "block"
+    },
+    {
+      "id": "R_BANNED_WORDS",
+      "desc": "不得使用广告法违禁词",
+      "type": "banned_words",
+      "words": ["国家级", "世界级", "史上最强"],
+      "severity": "block"
+    },
+    {
+      "id": "R_MAX_SHOTS",
+      "desc": "分镜数量建议不超过 8 个",
+      "type": "max_shots",
+      "value": 8,
+      "severity": "warn"
+    }
+  ]
+}

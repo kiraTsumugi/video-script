@@ -1,0 +1,34 @@
+{
+  "case": "missing_topic",
+  "description": "缺主题",
+  "topic": "",
+  "target_duration": 30,
+  "model_mode": "offline-mock",
+  "status": "needs_more_info",
+  "gap": [
+    "请补充：主题"
+  ],
+  "final": {
+    "action": "finish",
+    "status": "needs_more_info",
+    "reason": "关键信息缺失：主题",
+    "gap": [
+      "请补充：主题"
+    ]
+  },
+  "script": null,
+  "estimate": null,
+  "checks": null,
+  "trace": [
+    {
+      "n": 1,
+      "action": "finish",
+      "args": {},
+      "reason": "关键信息缺失：主题",
+      "observation": {
+        "finished": true,
+        "status": "needs_more_info"
+      }
+    }
+  ]
+}

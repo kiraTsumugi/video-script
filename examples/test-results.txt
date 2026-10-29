@@ -1,0 +1,36 @@
+test_impossible_target_explicit_failure (test_agent.TestCannotSatisfy.test_impossible_target_explicit_failure)
+目标 5s 过短：压缩 MAX_REVISIONS 轮后仍超 → 明确失败 + 缺口。 ... ok
+test_every_shot_cited (test_agent.TestFactDerivation.test_every_shot_cited) ... ok
+test_narration_derived_from_material_facts (test_agent.TestFactDerivation.test_narration_derived_from_material_facts) ... ok
+test_swap_material_changes_script (test_agent.TestFactDerivation.test_swap_material_changes_script)
+替换素材内容：脚本旁白随之改变，无旧内容残留。 ... ok
+test_generated_with_blocked_check_blocked (test_agent.TestGuards.test_generated_with_blocked_check_blocked) ... ok
+test_generated_without_check_blocked (test_agent.TestGuards.test_generated_without_check_blocked) ... ok
+test_canonical_trace_sequence (test_agent.TestMainFlow.test_canonical_trace_sequence) ... ok
+test_checks_clean_when_generated (test_agent.TestMainFlow.test_checks_clean_when_generated) ... ok
+test_display_total_matches_estimate (test_agent.TestMainFlow.test_display_total_matches_estimate)
+展示的总时长必须等于最终估算值（不一致视为未完成）。 ... ok
+test_normal_generation_with_revision (test_agent.TestMainFlow.test_normal_generation_with_revision) ... ok
+test_reestimate_after_revision (test_agent.TestMainFlow.test_reestimate_after_revision)
+修正后必须重新估算：两次估算分别为 38 / 28。 ... ok
+test_revision_triggered_by_observed_fact (test_agent.TestMainFlow.test_revision_triggered_by_observed_fact)
+压缩必须由「观察到超时长事实」触发：首估 38s > 30s。 ... ok
+test_within_target_no_revision (test_agent.TestMainFlow.test_within_target_no_revision)
+目标 45s 时首稿 38s 已达标，不得出现修正动作。 ... ok
+test_non_dict_no_crash (test_agent.TestMalformedOutput.test_non_dict_no_crash) ... ok
+test_unknown_action_no_crash (test_agent.TestMalformedOutput.test_unknown_action_no_crash) ... ok
+test_exact_fact_hit (test_agent.TestMatchingPrecision.test_exact_fact_hit) ... ok
+test_no_hit_returns_empty_and_all_ids (test_agent.TestMatchingPrecision.test_no_hit_returns_empty_and_all_ids) ... ok
+test_no_sliding_window_cross_hit (test_agent.TestMatchingPrecision.test_no_sliding_window_cross_hit) ... ok
+test_missing_duration (test_agent.TestMissingInfo.test_missing_duration) ... ok
+test_missing_topic (test_agent.TestMissingInfo.test_missing_topic) ... ok
+test_no_material_after_rewrite (test_agent.TestNoMaterial.test_no_material_after_rewrite) ... ok
+test_rewrite_then_hit (test_agent.TestRewritePath.test_rewrite_then_hit)
+无直击 → 模型改写查询「画面质量→画质」 → 命中 P02。 ... ok
+test_max_steps_incomplete (test_agent.TestStepLimit.test_max_steps_incomplete) ... ok
+test_tool_error_after_retry (test_agent.TestToolFailure.test_tool_error_after_retry) ... ok
+
+----------------------------------------------------------------------
+Ran 24 tests in 0.014s
+
+OK

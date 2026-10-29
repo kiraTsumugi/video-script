@@ -1,0 +1,56 @@
+{
+  "case": "no_material",
+  "description": "无素材：改写后仍无命中",
+  "topic": "完全无关主题xyz",
+  "target_duration": 30,
+  "model_mode": "offline-mock",
+  "status": "no_material",
+  "gap": [
+    "未找到相关素材，请补充素材或调整主题"
+  ],
+  "final": {
+    "action": "finish",
+    "status": "no_material",
+    "reason": "检索无结果且改写后仍无命中",
+    "gap": [
+      "未找到相关素材，请补充素材或调整主题"
+    ]
+  },
+  "script": null,
+  "estimate": null,
+  "checks": null,
+  "trace": [
+    {
+      "n": 1,
+      "action": "search_materials",
+      "args": {
+        "query": "完全无关主题xyz"
+      },
+      "reason": "检索产品素材",
+      "observation": {
+        "ok": true,
+        "query": "完全无关主题xyz",
+        "segments": [
+          "完全无关主题xyz"
+        ],
+        "hits": [],
+        "all_material_ids": [
+          "P01",
+          "P02",
+          "P03",
+          "P04"
+        ]
+      }
+    },
+    {
+      "n": 2,
+      "action": "finish",
+      "args": {},
+      "reason": "检索无结果且改写后仍无命中",
+      "observation": {
+        "finished": true,
+        "status": "no_material"
+      }
+    }
+  ]
+}

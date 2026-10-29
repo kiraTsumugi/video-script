@@ -1,0 +1,62 @@
+{
+  "case": "tool_failure",
+  "description": "工具失败：重试一次后明确失败",
+  "topic": "触发故障的查询",
+  "target_duration": 30,
+  "model_mode": "offline-mock",
+  "status": "tool_error",
+  "gap": [
+    "检索工具不可用，请稍后重试"
+  ],
+  "final": {
+    "action": "finish",
+    "status": "tool_error",
+    "reason": "素材检索连续失败，无法生成有依据的脚本",
+    "gap": [
+      "检索工具不可用，请稍后重试"
+    ]
+  },
+  "script": null,
+  "estimate": null,
+  "checks": null,
+  "trace": [
+    {
+      "n": 1,
+      "action": "search_materials",
+      "args": {
+        "query": "触发故障的查询"
+      },
+      "reason": "检索产品素材",
+      "observation": {
+        "ok": false,
+        "error": "tool_error",
+        "tool": "search_materials",
+        "message": "素材检索服务暂时不可用（故障注入）"
+      }
+    },
+    {
+      "n": 2,
+      "action": "search_materials",
+      "args": {
+        "query": "触发故障的查询"
+      },
+      "reason": "素材检索失败，重试一次",
+      "observation": {
+        "ok": false,
+        "error": "tool_error",
+        "tool": "search_materials",
+        "message": "素材检索服务暂时不可用（故障注入）"
+      }
+    },
+    {
+      "n": 3,
+      "action": "finish",
+      "args": {},
+      "reason": "素材检索连续失败，无法生成有依据的脚本",
+      "observation": {
+        "finished": true,
+        "status": "tool_error"
+      }
+    }
+  ]
+}
