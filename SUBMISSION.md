@@ -62,7 +62,7 @@ python -m unittest discover -s tests -v
 
 完整测试：**41 项**，`python -m unittest discover -s tests -v` 全绿（输出见 `examples/test-results.txt`）。
 
-## ReAct 决策证据（两条不同路径）
+## ReAct 决策证据（三条不同路径）
 
 **路径 A · 超时长修正**（`trace_normal.json`，7 步）：
 
@@ -141,6 +141,6 @@ src/agent/llm.py       模型接入（OpenAI 兼容 + 确定性离线 Mock；事
 src/agent/react_loop.py ReAct 循环（步数上限 12；generated 守卫）
 src/main.py            CLI 入口
 tests/test_agent.py    41 项可执行测试
-examples/              运行记录（8 组 Trace + CLI 输出 + 测试输出 + INDEX）+ 生成/验证脚本
-data/                  合成产品素材（P01-P04）+ 品牌规则 + 改写知识表
+examples/              运行记录（9 组 Trace + CLI 输出 + 测试输出 + INDEX）+ 生成/验证脚本
+data/                  合成产品素材（P01-P05）+ 品牌规则 + 改写知识表
 ```
