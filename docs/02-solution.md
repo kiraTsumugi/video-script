@@ -27,12 +27,13 @@
 **工具只返回事实，决策权 100% 归模型。** 代码里没有 `if 超时长 then 压缩`——
 压缩由"观察到 `over_target=true` 事实"触发。
 
-两条典型路径：
+三条典型路径：
 
 - **路径 A（超时长修正）**：`检索 → 起草38s → 估算(38>30) → 压缩 → 重估28s → 检查 → finish`
 - **路径 B（达标不修正）**：`检索 → 起草38s → 估算(38≤45) → 检查 → finish`（无 revise）
+- **路径 C（规则违规修正）**：`检索P05 → 起草 → 压缩 → 检查(违禁词block) → 修正标题/旁白 → 重估+重检 → finish`
 
-见 `examples/trace_normal.json` 与 `trace_within_target.json`。
+见 `examples/trace_normal.json`、`trace_within_target.json` 与 `trace_rule_violation.json`。
 
 ## 关键设计取舍
 
